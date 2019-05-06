@@ -44,8 +44,7 @@ void faseuno(Vector matriz,Vector &semimatriz,int primerafila,int ultimafila, in
     }
   }
 }
-void fasedos(Vector semimatriz,Vector &finalmatriz,int primeracolumna, int ultimacolumna, int row){
-  int rowsize=row;
+void fasedos(Vector semimatriz,Vector &finalmatriz,int primeracolumna, int ultimacolumna, int rowsize){
   int w;
   int q;
   int s[inf];
