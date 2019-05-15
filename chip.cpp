@@ -4,8 +4,8 @@
     #define IMAGEMAGICK_PATH "/usr/bin/convert"
 #endif
 
-#include "src/Image.hpp"
-#include "src/ImageExporter.hpp"
+#include "image/src/Image.hpp"
+#include "image/src/ImageExporter.hpp"
 
 typedef brahand::Image<uint> Image;
 
@@ -20,7 +20,7 @@ typedef brahand::Image<uint> Image;
 #include <atomic>
 #include <algorithm>
 #include <vector>
-#include "src/Vector.hpp"
+#include "image/src/Vector.hpp"
 
 #define NUM_THREADS 7
 using namespace std;
@@ -102,34 +102,39 @@ int numerothreads(int &filasporthread, int &restante,int  n){
 };
 
 int main(){
-  Image image("examples/image.png");
-  int ndimensions, nsize, number, rowsize,columnsize,depthsize;
-  vector<int> dimensions;
+  Image image("image/examples/fb2.png");
+  int rowsize,columnsize,depthsize;
 
-  dimensions.push_back(image.image_size.width);
-  dimensions.push_back(image.image_size.height);
-  dimensions.push_back(image.image_size.depth);
+  rowsize=image.image_size.height;
+  columnsize=image.image_size.width;
+  depthsize=image.image_size.depth;
 
-  int *dimensizes=dimensions.data();
-  Vector matriz(ndimensions,dimensizes);
-  Vector semimatriz(ndimensions,dimensizes);
-  Vector finalmatriz(ndimensions,dimensizes);
+  for(int y=0;y<rowsize;y++){
+    for(int x=0;x<columnsize;x++){
+      cout<<image[image.image_size(j,i,0)]<<" ";
+    }
+    cout<<endl;
+  }
+  cout<<endl;
 
-  rowsize=*dimensizes;
-  columnsize=*++dimensizes;
-  depthsize=*++dimensizes;
-  inf=rowsize+columnsize+depthsize;
-  matriz.actual=0;
-  for(int i = 0; i < rowsize; i++){
-    for(int j = 0; j < columnsize; j++){
-          matriz.set(image[image.image_size(i,j,0)],i,j) ;
+  for(int z = 0; z < depthsize;z++){
+    for(int y = 0; y < rowsize; y++){
+      for(int x = 0; x < columnsize; x++){
+          if(image[image.image_size(x,y,z)] > 128){
+            image[image.image_size(x,y,z)] = 1;
+          }
+          else{
+            image[image.image_size(x,y,z)] = 0;
+          }
+      }
     }
   }
 
+  //cout<<"Minimo "<<min<<endl;
   //Print matriz
   for(int i=0;i<rowsize;i++){
     for(int j=0;j<columnsize;j++){
-      cout<<matriz.get(i,j)<<" ";
+      cout<<image[image.image_size(j,i,0)]<<" ";
     }
     cout<<endl;
   }
@@ -141,6 +146,21 @@ int main(){
   int primero=0;
   int ultimo=n;
 
+/*
+  faseuno(matriz,semimatriz,0,rowsize,columnsize);
+  for(int i=0;i<rowsize;i++){
+    for(int j=0;j<columnsize;j++){
+      cout<<semimatriz.get(i,j)<<" ";
+    }
+    cout<<endl;
+  }
+  fasedos(semimatriz,finalmatriz,0,columnsize,rowsize);
+  for(int i=0;i<rowsize;i++){
+    for(int j=0;j<columnsize;j++){
+      cout<<finalmatriz.get(i,j)<<" ";
+    }
+    cout<<endl;
+  }
 /*
   //Fase Uno
   for (int i = 0; i < nthreads; ++i) {
