@@ -4,8 +4,8 @@
     #define IMAGEMAGICK_PATH "/usr/bin/convert"
 #endif
 
-#include "src/Image.hpp"
-#include "src/ImageExporter.hpp"
+#include "image/src/Image.hpp"
+#include "image/src/ImageExporter.hpp"
 
 typedef brahand::Image<uint> Image;
 
@@ -13,7 +13,7 @@ typedef brahand::Image<uint> Image;
 using namespace std;
 
 int main(){
-    Image image("examples/image.png");
+    Image image("image/examples/image.png");
     brahand::VTKExport::grayscale(image, "./", "image");
 
     return 0;
