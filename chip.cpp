@@ -20,35 +20,35 @@ using namespace std;
 int inf=0;
 
 int euclidian(int x, int i, int gI) {
-  return (x-i)*(x-i) + (gI*gI);
+        return (x-i)*(x-i) + (gI*gI);
 }
 
 int sep(int i,int u,int g_i,int g_u) {
-  return (u*u-i*i + g_u*g_u-g_i*g_i)/(2*(u-i));
+        return (u*u-i*i + g_u*g_u-g_i*g_i)/(2*(u-i));
 }
 
 void faseUno(Image image, Image &semimatriz, int primeraFila, int ultimaFila, int columnSize, int z){
-  for(int y = primeraFila; y < ultimaFila; y++) {
-    if(image[image.image_size(y,0,z)] == 0) {
-      semimatriz[semimatriz.image_size(y,0,z)]=0;
-    }
-    else{
-      semimatriz[semimatriz.image_size(y,0,z)]=inf;
-    }
-    for(int x = 1; x < columnSize; x++) {
-      if(image[image.image_size(y,x,z)] == 0) {
-              semimatriz[semimatriz.image_size(y,x,z)]=0;
-      }
-      else{
-              semimatriz[semimatriz.image_size(y,x,z)]=1 + semimatriz[semimatriz.image_size(y,x-1,z)];
-      }
-    }
-    for(int x = columnSize-2; x >= 0; x--) {
-      if(semimatriz[semimatriz.image_size(y,x+1,z)]<semimatriz[semimatriz.image_size(y,x,z)]) {
-              semimatriz[semimatriz.image_size(y,x,z)]=1+semimatriz[semimatriz.image_size(y,x+1,z)];
-      }
-    }
-  }
+        for(int y = primeraFila; y < ultimaFila; y++) {
+                if(image[image.image_size(y,0,z)] == 0) {
+                        semimatriz[semimatriz.image_size(y,0,z)]=0;
+                }
+                else{
+                        semimatriz[semimatriz.image_size(y,0,z)]=inf;
+                }
+                for(int x = 1; x < columnSize; x++) {
+                        if(image[image.image_size(y,x,z)] == 0) {
+                                semimatriz[semimatriz.image_size(y,x,z)]=0;
+                        }
+                        else{
+                                semimatriz[semimatriz.image_size(y,x,z)]=1 + semimatriz[semimatriz.image_size(y,x-1,z)];
+                        }
+                }
+                for(int x = columnSize-2; x >= 0; x--) {
+                        if(semimatriz[semimatriz.image_size(y,x+1,z)]<semimatriz[semimatriz.image_size(y,x,z)]) {
+                                semimatriz[semimatriz.image_size(y,x,z)]=1+semimatriz[semimatriz.image_size(y,x+1,z)];
+                        }
+                }
+        }
 }
 
 void fasedos(Image semimatriz,Image &finalmatriz,int primeracolumna, int ultimacolumna, int rowsize, int z){
@@ -135,7 +135,10 @@ int numerothreads(int &filasporthread, int &restante,int n){
 
 int main(){
         Image image("examples/hydrogen");
-        // cout<<image.image_size.total()<<endl;
+        /*cout<<image.image_size.total()<<endl;
+           cout<<image.image_size.width<<endl;
+           cout<<image.image_size.height<<endl;
+           cout<<image.image_size.depth<<endl;*/
         Image image2(image.image_size);
         Image image3(image.image_size);
         Image image4(image.image_size);
@@ -145,18 +148,18 @@ int main(){
         columnSize=image.image_size.width;
         depthsize=image.image_size.depth;
         inf=rowsize+columnSize+depthsize;
-        // for(int y=0; y<rowsize; y++) {
-        //         for(int x=0; x<columnSize; x++) {
-        //                 cout<<image[image.image_size(x,y,0)]<<" ";
-        //         }
-        //         cout<<endl;
-        // }
-        // cout<<endl;
+        /*for(int y=0; y<rowsize; y++) {
+                for(int x=0; x<columnSize-70; x++) {
+                        cout<<image[image.image_size(x,y,0)]<<" ";
+                }
+                cout<<endl;
+           }
+           cout<<endl;*/
 
         for(int z = 0; z < depthsize; z++) {
                 for(int y = 0; y < rowsize; y++) {
                         for(int x = 0; x < columnSize; x++) {
-                                if(image[image.image_size(x,y,z)] > 128) {
+                                if(image[image.image_size(x,y,z)] > 0) {
                                         image[image.image_size(x,y,z)] = 1;
                                 }
                                 else{
@@ -166,43 +169,47 @@ int main(){
                 }
         }
 
-        //cout<<"Minimo "<<min<<endl;
+
         //Print matriz
-        // for(int y=0; y<rowsize; y++) {
-        //         for(int x=0; x<columnSize; x++) {
-        //                 cout<<image[image.image_size(x,y,0)]<<" ";
-        //         }
-        //         cout<<endl;
-        // }
-        // cout<<endl;
+        /*  for(int y=0; y<rowsize; y++) {
+                  for(int x=0; x<columnSize-32; x++) {
+                          cout<<image[image.image_size(x,y,0)]<<" ";
+                  }
+                  cout<<endl;
+           }
+           cout<<endl;*/
 
         //Threads
         int n,diferencia;
         int nthreads=numerothreads(n,diferencia,columnSize);
         thread threads[nthreads];
+        int dif=diferencia;
         int primero=0;
         int ultimo=n;
 
         //Fase Uno
         for (int z = 0; z < depthsize; z++) {
-          for (int i = 0; i < nthreads; ++i) {
-            if(diferencia!=0) {
-              threads[i] = thread(faseUno, image,std::ref(image2),primero,ultimo+1,rowsize,z);//ultimafila+1
-              primero+=n+1;
-              ultimo+=n+1;
-              diferencia--;
-            }else{
-              threads[i] = thread(faseUno, image,std::ref(image2),primero,ultimo,rowsize,z);//ultimafila
-              primero+=n;
-              ultimo+=n;
-            }
-          }
-          for (int i = 0; i < nthreads; ++i) {
-            threads[i].join();
-          }
+                for (int i = 0; i < nthreads; ++i) {
+                        if(diferencia!=0) {
+                                threads[i] = thread(faseUno, image,std::ref(image2),primero,ultimo+1,rowsize,z);//ultimafila+1
+                                primero+=n+1;
+                                ultimo+=n+1;
+                                diferencia--;
+                        }else{
+                                threads[i] = thread(faseUno, image,std::ref(image2),primero,ultimo,rowsize,z);//ultimafila
+                                primero+=n;
+                                ultimo+=n;
+                        }
+                }
+                for (int i = 0; i < nthreads; ++i) {
+                        threads[i].join();
+                }
+                primero=0;
+                ultimo=n;
+                diferencia=dif;
         }
 
-
+        //cout << "bika 1" << '\n';
         //Print semimatriz
         // cout<<endl;
         // for(int y=0; y<rowsize; y++) {
@@ -216,62 +223,72 @@ int main(){
         //Fase dos
         nthreads=numerothreads(n,diferencia,rowsize);
         thread threads2[nthreads];
+        dif=diferencia;
         primero=0;
         ultimo=n;
         for (size_t z = 0; z < depthsize; z++) {
-          for (int i = 0; i < nthreads; ++i) {
-            if(diferencia!=0) {
+                for (int i = 0; i < nthreads; ++i) {
+                        if(diferencia!=0) {
 
-              threads2[i] = thread(fasedos, image2,std::ref(image3),primero,ultimo+1,columnSize,z);//ultimafila+1
-              primero+=n+1;
-              ultimo+=n+1;
-              diferencia--;
-            }else{
-              threads2[i] = thread(fasedos, image2,std::ref(image3),primero,ultimo,columnSize,z);//ultimafila
-              primero+=n;
-              ultimo+=n;
-            }
-          }
-          for (int i = 0; i < nthreads; ++i) {
-            threads2[i].join();
-          }
+                                threads2[i] = thread(fasedos, image2,std::ref(image3),primero,ultimo+1,columnSize,z);//ultimafila+1
+                                primero+=n+1;
+                                ultimo+=n+1;
+                                diferencia--;
+                        }else{
+                                threads2[i] = thread(fasedos, image2,std::ref(image3),primero,ultimo,columnSize,z);//ultimafila
+                                primero+=n;
+                                ultimo+=n;
+                        }
+                }
+                for (int i = 0; i < nthreads; ++i) {
+                        threads2[i].join();
+                }
+                primero=0;
+                ultimo=n;
+                diferencia=dif;
         }
-
+        //cout << "bika 2" << '\n';
         //Fase tres
+
         nthreads=numerothreads(n,diferencia,depthsize);
         thread threads3[nthreads];
         primero=0;
         ultimo=n;
         for (size_t x = 0; x < columnSize; x++) {
-          for (int i = 0; i < nthreads; ++i) {
-                  if(diferencia!=0) {
+                for (int i = 0; i < nthreads; ++i) {
+                        if(diferencia!=0) {
 
-                          threads3[i] = thread(fasetres, image3,std::ref(image4),primero,ultimo+1,rowsize,x);//ultimafila+1
-                          primero+=n+1;
-                          ultimo+=n+1;
-                          diferencia--;
-                  }else{
-                          threads3[i] = thread(fasetres, image3,std::ref(image4),primero,ultimo,rowsize,x );//ultimafila
-                          primero+=n;
-                          ultimo+=n;
-                  }
-          }
-          for (int i = 0; i < nthreads; ++i) {
-                  threads3[i].join();
-          }
+                                threads3[i] = thread(fasetres, image3,std::ref(image4),primero,ultimo+1,rowsize,x);//ultimafila+1
+                                primero+=n+1;
+                                ultimo+=n+1;
+                                diferencia--;
+                        }else{
+                                threads3[i] = thread(fasetres, image3,std::ref(image4),primero,ultimo,rowsize,x );//ultimafila
+                                primero+=n;
+                                ultimo+=n;
+                        }
+                }
+                for (int i = 0; i < nthreads; ++i) {
+                        threads3[i].join();
+                }
+                primero=0;
+                ultimo=n;
+                diferencia=dif;
         }
-
+        //cout << "bika 3" << '\n';
 
         //Print finalmatriz
-        // cout<<endl;
-        // for(int y=0; y<rowsize; y++) {
-        //         for(int x=0; x<columnSize; x++) {
-        //                 cout<<image3[image3.image_size(x,y,0)]<<" ";
-        //         }
-        //         cout<<endl;
-        // }
-        // cout<<endl;
+        int max=0;
+        for (int z = 0; z < depthsize; z++) {
+                for(int y=0; y<rowsize; y++) {
+                        for(int x=0; x<columnSize; x++) {
+                                if(max<image[image.image_size(x,y,z)]) {
+                                        max=image[image.image_size(x,y,z)];
+                                }
+                        }
 
-        brahand::VTKExport::grayscale(image3, "./", "image");
+                }
+        }
+        brahand::VTKExport::grayscale(image4, "./", "aguita",max);
         return 0;
 }
